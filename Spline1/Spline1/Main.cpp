@@ -4,9 +4,9 @@
 #include <map>
 #include <iterator>
 #include <algorithm>
-#include <functional> 
+#include <cmath> 
+#include <iomanip> 
 using std::upper_bound;
-using std::lower_bound;
 using namespace std;
 ifstream fin("input.in");
 ofstream fout("output.out");
@@ -16,8 +16,9 @@ vector<double>x_values;
 vector<vector<double>>y_values;
 vector<double>points;
 vector<vector<double>>coefficients;
+vector<int>indexes;
 double alph, l, u, z, c, b, d;
-vector<double>::iterator low, up;
+// vector<double>::iterator low, up;
 const int COEF = 10; // 10 - x, y, h, alph, l, u, z, c, b, d;
 
 int main() {
@@ -33,14 +34,6 @@ int main() {
 		coefficients[i][0] = temp;
 	}
 
-	up = upper_bound(x_values.begin(), x_values.end() - 1, 0.9);
-	low = lower_bound(x_values.begin(), x_values.end() - 1, 0.9);
-	cout << *up << "YEEEEEY" << endl;
-	cout << *low << "kkkkkk";
-	auto idx = low - x_values.begin();
-	int index = (int)idx;
-	cout << index << "INDEX" << endl;
-
 	fin >> m;
 	y_values.resize(m, vector<double>(n));
 
@@ -52,8 +45,21 @@ int main() {
 		}
 
 	fin >> k;
-	cout << k;
+	//cout << k << " - this is k" << endl;
 	points.resize(k);
+	indexes.resize(k);
+	for (int i = 0; i < k; i++)
+	{
+		fin >> temp;
+		points[i] = temp;
+		auto up = upper_bound(x_values.begin(), x_values.end() - 1, temp);
+		//cout << *up << " - YEEEEEY" << endl;
+		auto idx = up - x_values.begin();
+		int index = (int)idx;
+		/*cout << index << "- INDEX" << endl;
+		cout << x_values[i] << " " << temp << endl;*/
+		indexes[i] = index - 1;
+	}
 
 	// filling l, u, z, c, b ,d const values on border points
 	coefficients[0][4] = 1;
@@ -109,30 +115,23 @@ int main() {
 		}
 		coefficients[0][7] = (coefficients[0][6] - coefficients[0][5] * coefficients[1][7]);
 
+		// finish completeion of y's set. Let's go to fiding values at control points
+
+		for (int i = 0; i < k; i++)
+		{
+			int c = indexes[i];
+			//fout << c << endl;
+			double difference = points[i] - coefficients[c][0];
+			fout << difference << endl;
+			double res = coefficients[c][1] + coefficients[c][9] * difference +
+				coefficients[c][7] * pow(difference, 2) + coefficients[c][9] * pow(difference, 3);
+			cout << setprecision(7) << res << " FUCCCCCCK YEEEEEEAAAH,    ";
+		}
+		cout << endl << "NEW LINE: " << endl;
 
 	}
-
-
-
-
-	/*
-	for (int i = 0; i < k; i++)
-	{
-	cout << "Flag";
-	fin >> temp;
-	points[i] = temp;
-	}
-
-
-
-	fout << n << " " << m << " "<< k << endl;
-	for (int i = 0; i < n; i++)
-	{
-	fout << x_values[i] << " ";
-	}*/
-
-
 
 
 	system("PAUSE");
+
 }
